@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id                String   @id @default(cuid())
+  userId            String
+  title             String
+  message           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  isDeleted         Boolean  @default(false)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments          Comments[]
+}
+
+model Comments {
+  id                String  @id @default(cuid())
+  userId            String
+  postId            String
+  message           String
+  createdAt         DateTime @default(now())
+  isDeleted         Boolean  @default(false)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post              Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+// Necessary for Next auth
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id //@default(cuid())
+  name          String?   @unique
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   @default("https://instagram.fsac1-2.fna.fbcdn.net/v/t51.2885-15/188083838_103076231913070_7078314247183002812_n.jpg?stp=dst-jpg_e35_s1080x1080&_nc_ht=instagram.fsac1-2.fna.fbcdn.net&_nc_cat=110&_nc_ohc=cIW_26YbYJ8AX-CHZ9K&edm=AP_V10EBAAAA&ccb=7-5&oh=00_AfAADuLiWibwBsvyr46O2_iTuwZh8negehQvoItdan3tig&oe=63880EB1&_nc_sid=4f375e")
+  createdAt     DateTime  @default(now())
+  lastLogin     DateTime?
+  isBanned      Boolean  @default(false)
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  comments      Comments[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
