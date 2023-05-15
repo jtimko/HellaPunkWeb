@@ -4,14 +4,14 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const prisma = new PrismaClient()
 
-  const {userId, name} = await req.json();
+  const body = await req.json();
 
   const data = await prisma.user.update({
     where: {
-        id: userId,
+        id: body.userId,
     },
     data: {
-        name: name,
+        name: body.name,
     }
   })
   return NextResponse.json(data);

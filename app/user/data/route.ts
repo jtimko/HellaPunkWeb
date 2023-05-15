@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const prisma = new PrismaClient()
 
-  const {userId} = await req.json();
+  const body = await req.json();
 
   const data = await prisma.user.findFirst({
     where: {
-        id: userId,
+        id: body.userId,
     },
     select: {
         id: true,

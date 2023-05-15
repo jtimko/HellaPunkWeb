@@ -4,14 +4,14 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
     const prisma = new PrismaClient()
 
-    const { title, message, id } = await req.json();
+    const body = await req.json();
 
     const data = await prisma.post.create({
         data: {
-            title: title,
-            message: message,
+            title: body.title,
+            message: body.message,
             updatedAt: new Date(),
-            userId: id
+            userId: body.id
         }
     });
     return NextResponse.json(data);
