@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
   const data = await prisma.user.update({
     where: {
-        id: body.userId,
+        email: body.email,
     },
     data: {
         name: body.name,
